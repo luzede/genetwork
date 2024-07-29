@@ -1,0 +1,39 @@
+{
+	"name": "demoapp",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -b && vite build",
+		"lint": "npx @biomejs/biome lint --write",
+		"lint:log": "npx @biomejs/biome lint --write --log-level=info --log-kind=pretty",
+		"format": "npx @biomejs/biome format --write",
+		"format:log": "npx @biomejs/biome format --write --log-level=info --log-kind=pretty",
+		"check": "npx @biomejs/biome check --write",
+		"check:log": "npx @biomejs/biome check --write --log-level=info --log-kind=pretty",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"@radix-ui/react-slot": "^1.1.0",
+		"class-variance-authority": "^0.7.0",
+		"clsx": "^2.1.1",
+		"lucide-react": "^0.417.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"tailwind-merge": "^2.4.0",
+		"tailwindcss-animate": "^1.0.7"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.8.3",
+		"@types/node": "^22.0.0",
+		"@types/react": "^18.3.3",
+		"@types/react-dom": "^18.3.0",
+		"@vitejs/plugin-react": "^4.3.1",
+		"autoprefixer": "^10.4.19",
+		"postcss": "^8.4.40",
+		"tailwindcss": "^3.4.7",
+		"typescript": "^5.2.2",
+		"vite": "^5.3.4"
+	}
+}
