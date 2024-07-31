@@ -6,7 +6,7 @@ PRAGMA defer_foreign_keys = ON;
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
     username VARCHAR(30) PRIMARY KEY,
-    password_hash VARCHAR(60) NOT NULL,
+    password_hash VARCHAR(97) NOT NULL,
     email VARCHAR(255) NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP

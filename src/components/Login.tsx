@@ -39,6 +39,10 @@ const loginSchema = z.object({
 		.min(8, { message: "Password length must be at least 8 characters long." })
 		.max(50, {
 			message: "Password length must be at most 50 characters long.",
+		})
+		.regex(/^[a-zA-Z0-9!@#$%^&*]*$/, {
+			message:
+				"Password must contain only letters, numbers, and following special characters: !@#$%^&*",
 		}),
 });
 
