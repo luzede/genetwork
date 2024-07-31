@@ -11,8 +11,6 @@
 		"prefix": ""
 	},
 	"aliases": {
-		// Choose folders to place components and utils
-		// Info: https://ui.shadcn.com/docs/components-json
 		"components": "@/components",
 		"utils": "@/lib/utils"
 	}
