@@ -134,7 +134,7 @@ export default function Login() {
 					setLoginError(err.response.data as { message: string });
 				} else {
 					setLoginError({
-						message: "An error occurred while registering the account.",
+						message: "An error occurred during login process in the account.",
 					});
 				}
 			}
