@@ -36,7 +36,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 			.first<User>();
 
 		if (!user) {
-			return Response.json({ message: "User not found" }, { status: 404 });
+			return Response.json({ message: "Invalid credentials" }, { status: 401 });
 		}
 
 		const passwordMatch = await verifyPassword(

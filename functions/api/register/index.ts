@@ -43,7 +43,10 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 			.first<{ username: string }>();
 
 		if (user) {
-			return Response.json({ message: "User already exists" }, { status: 409 });
+			return Response.json(
+				{ message: "Username already exists" },
+				{ status: 409 },
+			);
 		}
 		const email = await ctx.env.DB.prepare(
 			"SELECT email FROM users WHERE email = ?1",
@@ -65,7 +68,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 			.bind(data.username, hashedPassword, data.email)
 			.run();
 
-		return Response.json({ message: "User created" }, { status: 201 });
+		return Response.json({ message: "User account created" }, { status: 201 });
 	} catch (e) {
 		if (e instanceof SyntaxError) {
 			return Response.json(
