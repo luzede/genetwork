@@ -20,8 +20,6 @@ const bodySchema = z.object({
 });
 
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
-	console.log(ctx.env.DB);
-
 	// // Transforming ReadableStream<Uint8Array> into JSON string
 	// // All of this is eventually useless since "ctx.request.json()" achieve the same result
 	// const bodyReader = ctx.request.body.getReader();
@@ -38,14 +36,36 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 		// Hashing the password
 		const hashedPassword = await hashPassword(data.password);
 
+		const user = await ctx.env.DB.prepare(
+			"SELECT username FROM users WHERE username = ?1",
+		)
+			.bind(data.username)
+			.first<{ username: string }>();
+
+		if (user) {
+			return Response.json({ message: "User already exists" }, { status: 409 });
+		}
+		const email = await ctx.env.DB.prepare(
+			"SELECT email FROM users WHERE email = ?1",
+		)
+			.bind(data.email)
+			.first<{ email: string }>();
+
+		if (email) {
+			return Response.json(
+				{ message: "Email already exists" },
+				{ status: 409 },
+			);
+		}
+
 		// Inserting data into the database
-		const resp = await ctx.env.DB.prepare(
+		await ctx.env.DB.prepare(
 			"INSERT INTO users (username, password_hash, email) VALUES (?1, ?2, ?3);",
 		)
 			.bind(data.username, hashedPassword, data.email)
 			.run();
 
-		return Response.json(resp, { status: 201 });
+		return Response.json({ message: "User created" }, { status: 201 });
 	} catch (e) {
 		if (e instanceof SyntaxError) {
 			return Response.json(

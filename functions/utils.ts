@@ -1,3 +1,10 @@
+/* 
+This can further be improved further by modifying providedSalt
+to accept a string instead of a Uint8Array (maybe?).
+*/
+
+// Password hashing function
+// It returns a hex string of length 97
 export async function hashPassword(
 	password: string,
 	providedSalt?: Uint8Array,
@@ -39,6 +46,7 @@ export async function hashPassword(
 	return `${saltHex}:${hashHex}`;
 }
 
+// Verify password function
 export async function verifyPassword(
 	storedHash: string,
 	passwordAttempt: string,
