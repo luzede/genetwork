@@ -23,7 +23,7 @@ export async function hashPassword(
 		{
 			name: "PBKDF2",
 			salt: salt,
-			iterations: 1000,
+			iterations: 100, // 100000 is the maximum number of iterations
 			hash: "SHA-256",
 		},
 		keyMaterial,

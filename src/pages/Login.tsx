@@ -160,8 +160,8 @@ export default function Login() {
 	) : (
 		<Card className="w-full max-w-md mx-auto">
 			<CardHeader>
-				<CardTitle>Login</CardTitle>
-				<CardDescription>
+				<CardTitle className="text-center">Login</CardTitle>
+				<CardDescription className="text-center">
 					Enter your email and password to access your account
 				</CardDescription>
 			</CardHeader>
