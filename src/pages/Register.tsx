@@ -111,7 +111,7 @@ export default function Register() {
 	return tokenExists ? (
 		<></>
 	) : (
-		<Card className="w-full max-w-md mx-auto">
+		<Card className="w-full max-w-md mx-auto my-32 lg:my-12">
 			<CardHeader>
 				<CardTitle className="text-center">Registration</CardTitle>
 				<CardDescription className="text-center">

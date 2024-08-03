@@ -3,10 +3,16 @@ import { UserMenu } from "@/components/UserMenu";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import ThemeSwitcherButton from "./ThemeSwitcherButton";
+import { cn } from "@/lib/utils";
 
-export default function NavBar() {
+export default function NavBar({ className }: { className?: string }) {
 	return (
-		<header className="w-full flex items-center justify-between px-3 sm:px-6 md:px-12 border-b shadow-sm py-3">
+		<header
+			className={cn(
+				className,
+				"w-full flex items-center justify-between px-3 sm:px-6 md:px-12 border-b shadow-sm py-3",
+			)}
+		>
 			<Button className="text-2xl" variant="ghost">
 				<Link to="/">
 					<b>GENetwork</b>

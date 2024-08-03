@@ -31,6 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { AlertErrorMessage } from "@/components";
+import { useToken } from "@/tokenContext";
 
 const loginSchema = z.object({
 	username: z
@@ -54,7 +55,7 @@ const loginSchema = z.object({
 
 export default function Login() {
 	const navigate = useNavigate();
-	const [tokenExists] = useState(localStorage.getItem("token") !== null);
+	const { token, setToken } = useToken();
 
 	// If navigated from registration page and registration was successful
 	// then the current location state will have "accountCreated" attribute
@@ -73,10 +74,10 @@ export default function Login() {
 	// before I returned the page from the function, I navigated to another page
 	// Maybe I have to first let it render, and then navigate)
 	useEffect(() => {
-		if (tokenExists) {
+		if (token) {
 			navigate("/");
 		}
-	}, [tokenExists, navigate]);
+	}, [token, navigate]);
 
 	// I just want it to run once when the component is mounted
 	// and I can't do it without suppressing the lint warning
@@ -127,6 +128,7 @@ export default function Login() {
 			// Save the token in the local storage
 			// and redirect the user to the home page
 			localStorage.setItem("token", resp.data.token);
+			setToken(resp.data.token);
 			navigate("/");
 		} catch (err) {
 			if (err instanceof axios.AxiosError) {
@@ -155,10 +157,10 @@ export default function Login() {
 		form.requestSubmit();
 	}
 
-	return tokenExists ? (
+	return token ? (
 		<></>
 	) : (
-		<Card className="w-full max-w-md mx-auto">
+		<Card className="w-full max-w-md mx-auto my-32 lg:my-12">
 			<CardHeader>
 				<CardTitle className="text-center">Login</CardTitle>
 				<CardDescription className="text-center">

@@ -15,8 +15,9 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+
 import { useNavigate, useLocation } from "react-router-dom";
+import { useToken } from "@/tokenContext";
 
 type Props = {
 	className?: string;
@@ -25,14 +26,12 @@ type Props = {
 export function UserMenu({ className }: Props) {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const [TokenExists, setTokenExists] = useState(
-		localStorage.getItem("token") !== null,
-	);
+	const { token, setToken } = useToken();
 
 	const handleLogout = () => {
 		console.log("Logging out...");
 		localStorage.removeItem("token");
-		setTokenExists(false);
+		setToken(null);
 	};
 
 	return (
@@ -42,7 +41,7 @@ export function UserMenu({ className }: Props) {
 					<UserIcon className="h-8 w-8" />
 				</Button>
 			</DropdownMenuTrigger>
-			{TokenExists ? (
+			{token ? (
 				<DropdownMenuContent align="end">
 					<DropdownMenuLabel>My Account</DropdownMenuLabel>
 					<DropdownMenuSeparator />

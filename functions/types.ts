@@ -5,3 +5,11 @@ export type User = {
 	created_at: string;
 	updated_at: string;
 };
+
+export type Post = {
+	id: number;
+	content: string;
+	owner: string;
+	likes: number;
+	created_at: string;
+};
