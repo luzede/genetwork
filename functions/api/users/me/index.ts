@@ -21,5 +21,6 @@ export const onRequestGet: PagesFunction<
 	return Response.json({
 		username: user.username,
 		email: user.email,
+		profile_url: user.profile_url,
 	});
 };

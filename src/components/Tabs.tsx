@@ -18,7 +18,7 @@ export function Tabs({ className }: Props) {
 		<div
 			className={cn(
 				className,
-				"w-full mx-auto flex flex-row justify-around fixed bottom-0 align-middle",
+				"w-full mx-auto flex flex-row justify-around fixed bottom-0 align-middle bg-background",
 			)}
 		>
 			<Button

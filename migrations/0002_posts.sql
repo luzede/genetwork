@@ -9,7 +9,7 @@ CREATE TABLE posts (
     "owner" VARCHAR(30) NOT NULL,
     likes INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY ("owner") REFERENCES users(username) ON DELETE CASCADE
+    FOREIGN KEY ("owner") REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE INDEX posts_created_at_index
@@ -20,8 +20,8 @@ DROP TABLE IF EXISTS user_likes_post;
 CREATE TABLE user_likes_post (
     username VARCHAR(30) NOT NULL,
     post_id INTEGER NOT NULL,
-    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
-    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+    FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
     PRIMARY KEY (username, post_id)
 );
 
