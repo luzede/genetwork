@@ -1,11 +1,10 @@
 // Hooks and other utilities
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDropzone } from "react-dropzone";
 import type { z } from "zod";
-import { useQuery, QueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 // Components
 import { Input } from "./ui/input";
@@ -16,7 +15,7 @@ import { cn } from "@/lib/utils";
 // import { toast } from "sonner";
 
 // Requests
-import { getCurrentUser } from "@/requests/user";
+import { getUser } from "@/requests/user";
 
 // Schemas
 import { imageFormSchema } from "@/zodSchemas";
@@ -28,21 +27,11 @@ type Props = {
 
 export const ImageUploader = React.forwardRef<HTMLFormElement, Props>(
 	({ className, onSubmit }, ref) => {
-		const navigate = useNavigate();
-		const queryClient = new QueryClient();
 		const userQuery = useQuery({
 			queryKey: ["user"],
-			queryFn: getCurrentUser,
+			queryFn: () => getUser(localStorage.getItem("token")),
+			retry: false,
 		});
-
-		useEffect(() => {
-			console.log("ImageUploader.tsx useEffect");
-			if (userQuery.isError) {
-				localStorage.removeItem("token");
-				queryClient.invalidateQueries({ queryKey: ["user"] });
-				navigate("/login");
-			}
-		}, [userQuery, queryClient, navigate]);
 
 		const [preview, setPreview] = React.useState<string | ArrayBuffer | null>(
 			"",

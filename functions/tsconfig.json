@@ -3,7 +3,11 @@
       "target": "esnext",
       "module": "esnext",
       "lib": ["esnext"],
-      "types": ["@cloudflare/workers-types"],
-      "moduleResolution": "Bundler"
+      "types": ["@cloudflare/workers-types", "@aws-sdk/types"],
+      "moduleResolution": "Bundler",
+      "baseUrl": ".",
+      "paths": {
+        
+      },
     },
 }

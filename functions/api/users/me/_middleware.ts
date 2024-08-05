@@ -26,3 +26,5 @@ const authentication: PagesFunction<Env> = async (ctx) => {
 };
 
 export const onRequestGet = [authentication];
+export const onRequestPut = [authentication];
+export const onRequestPost = [authentication];

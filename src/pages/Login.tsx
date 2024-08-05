@@ -3,14 +3,16 @@
 // After that, with every change in the form fields, the validation
 // happens instantly on each keystroke.
 
+// Hooks and other utilities
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import { QueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import type { z } from "zod";
 import axios from "axios";
 
+// Components
 import {
 	Form,
 	FormControl,
@@ -33,27 +35,11 @@ import { useToast } from "@/components/ui/use-toast";
 import { AlertErrorMessage } from "@/components";
 import { useToken } from "@/tokenContext";
 
-const loginSchema = z.object({
-	username: z
-		.string()
-		.min(3, { message: "Username must be at least 3 characters." })
-		.max(30, { message: "Username must be at most 30 characters." })
-		.regex(/^[a-zA-Z0-9]*$/, {
-			message: "Username must contain only letters and numbers",
-		}),
-	password: z
-		.string()
-		.min(8, { message: "Password length must be at least 8 characters long." })
-		.max(50, {
-			message: "Password length must be at most 50 characters long.",
-		})
-		.regex(/^[a-zA-Z0-9!@#$%^&*]*$/, {
-			message:
-				"Password must contain only letters, numbers, and following special characters: !@#$%^&*",
-		}),
-});
+// Schemas
+import { loginSchema } from "@/zodSchemas";
 
 export default function Login() {
+	const queryClient = new QueryClient();
 	const navigate = useNavigate();
 	const { token, setToken } = useToken();
 
@@ -129,6 +115,8 @@ export default function Login() {
 			// and redirect the user to the home page
 			localStorage.setItem("token", resp.data.token);
 			setToken(resp.data.token);
+			queryClient.invalidateQueries({ queryKey: ["user"] });
+			queryClient.resetQueries({ queryKey: ["user"] });
 			navigate("/");
 		} catch (err) {
 			if (err instanceof axios.AxiosError) {

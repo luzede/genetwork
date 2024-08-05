@@ -16,7 +16,14 @@ export const onRequestGet: PagesFunction<Env, string> = async (ctx) => {
 			return Response.json({ message: "User not found" }, { status: 404 });
 		}
 
-		return Response.json({ username: user.username }, { status: 200 });
+		return Response.json(
+			{
+				username: user.username,
+				email: user.email,
+				profile_url: user.profile_url,
+			},
+			{ status: 200 },
+		);
 	} catch (e) {
 		return Response.json({ name: e.name, message: e.message }, { status: 500 });
 	}

@@ -3,6 +3,7 @@ import * as jose from "jose";
 
 import { verifyPassword } from "../../utils";
 import type { User } from "../../types";
+import { loginSchema } from "../../schemas";
 
 interface Env {
 	DB: D1Database;
@@ -10,24 +11,11 @@ interface Env {
 	JWT_EXPIRATION: string;
 }
 
-const bodySchema = z.object({
-	username: z
-		.string()
-		.min(3)
-		.max(30)
-		.regex(/^[a-zA-Z0-9_]+$/),
-	password: z
-		.string()
-		.min(8)
-		.max(50)
-		.regex(/^[a-zA-Z0-9!@#$%^&*]*$/),
-});
-
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 	try {
 		const body = await ctx.request.json();
 
-		const data = bodySchema.parse(body);
+		const data = loginSchema.parse(body);
 
 		const user = await ctx.env.DB.prepare(
 			"SELECT * FROM users WHERE username = ?1",

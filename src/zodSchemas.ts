@@ -48,3 +48,23 @@ export const imageFormSchema = z.object({
 		.instanceof(File)
 		.nullish(),
 });
+
+export const loginSchema = z.object({
+	username: z
+		.string()
+		.min(3, { message: "Username must be at least 3 characters." })
+		.max(30, { message: "Username must be at most 30 characters." })
+		.regex(/^[a-zA-Z0-9]*$/, {
+			message: "Username must contain only letters and numbers",
+		}),
+	password: z
+		.string()
+		.min(8, { message: "Password length must be at least 8 characters long." })
+		.max(50, {
+			message: "Password length must be at most 50 characters long.",
+		})
+		.regex(/^[a-zA-Z0-9!@#$%^&*]*$/, {
+			message:
+				"Password must contain only letters, numbers, and following special characters: !@#$%^&*",
+		}),
+});

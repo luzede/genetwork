@@ -1,3 +1,6 @@
+import type { z } from "zod";
+import type { imageDetailsSchema } from "./schemas";
+
 export type User = {
 	username: string;
 	email: string;
@@ -7,6 +10,13 @@ export type User = {
 	updated_at: string;
 };
 
+export type UserUpdate = {
+	username: string;
+	email: string;
+	old_password?: string;
+	new_password?: string;
+};
+
 export type Post = {
 	id: number;
 	content: string;
@@ -14,3 +24,5 @@ export type Post = {
 	likes: number;
 	created_at: string;
 };
+
+export type imageDetails = z.infer<typeof imageDetailsSchema>;

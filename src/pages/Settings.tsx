@@ -2,10 +2,11 @@
 import { useRef, useState, useEffect } from "react";
 import type { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToken } from "@/tokenContext";
 
 // Components
 import {
@@ -30,28 +31,44 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
 // Requests
-import { getCurrentUser, updateCurrentUser } from "@/requests/user";
+import { getUser, updateUser } from "@/requests/user";
 
 // Schemas
 import { settingsSchema } from "@/zodSchemas";
+
+// Protected
+const protected_pathnames = ["/settings", "/profile", "/create"];
 
 // ####################################################
 // COMPONENT
 // ####################################################
 export default function Settings() {
+	const location = useLocation();
 	const [error, setError] = useState<{
 		message: string;
 		name?: string;
 	} | null>(null);
+	const { token, setToken } = useToken();
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const userQuery = useQuery({
 		queryKey: ["user"],
-		queryFn: getCurrentUser,
+		queryFn: () => getUser(localStorage.getItem("token")),
 		retry: false,
 	});
+
+	useEffect(() => {
+		if (userQuery.isError || token === null) {
+			localStorage.removeItem("token");
+			setToken(null);
+			queryClient.invalidateQueries({ queryKey: ["user"] });
+			queryClient.resetQueries({ queryKey: ["user"] });
+			if (protected_pathnames.includes(location.pathname)) navigate("/login");
+		}
+	}, [navigate, userQuery, setToken, queryClient, token, location]);
+
 	const userMutation = useMutation({
-		mutationFn: updateCurrentUser,
+		mutationFn: updateUser,
 		onSuccess: () => {
 			toaster.toast({
 				variant: "default",
@@ -59,11 +76,17 @@ export default function Settings() {
 				duration: 5000,
 				description: "Profile settings updated successfully",
 			});
+
+			queryClient.invalidateQueries({ queryKey: ["user"] });
+			queryClient.resetQueries({ queryKey: ["user"] });
 		},
 		onError: (e) => {
 			if (e instanceof axios.AxiosError) {
 				if (e.response?.status === 403) {
 					setError(e.response.data as { message: string });
+					localStorage.removeItem("token");
+					setToken(null);
+					navigate("/login");
 				} else {
 					setError(
 						e.response?.data || {
@@ -76,23 +99,10 @@ export default function Settings() {
 				setError({ message: e.message });
 			}
 
-			localStorage.removeItem("token");
 			queryClient.invalidateQueries({ queryKey: ["user"] });
+			queryClient.resetQueries({ queryKey: ["user"] });
 		},
 	});
-
-	useEffect(() => {
-		console.log("Settings.tsx useEffect");
-		if (userQuery.isError) {
-			localStorage.removeItem("token");
-			queryClient.invalidateQueries({ queryKey: ["user"] });
-			navigate("/login");
-		}
-		if (userMutation.isError) {
-			localStorage.removeItem("token");
-			queryClient.invalidateQueries({ queryKey: ["user"] });
-		}
-	}, [userQuery, userMutation, queryClient, navigate]);
 
 	const imageFormRef = useRef<HTMLFormElement>(null);
 
@@ -100,7 +110,14 @@ export default function Settings() {
 
 	const handleImageSubmit = async (values: { image?: File | null }) => {
 		if (!values.image) return;
-		console.log(values.image.name);
+
+		const body = {
+			name: values.image.name,
+			size: values.image.size,
+			type: values.image.type,
+		};
+
+		console.log(body);
 		// 	// toast.success(`Image uploaded successfully 🎉 ${values.image.name}`);
 
 		// 	// I guess here I get the signed URL from the server
@@ -110,47 +127,32 @@ export default function Settings() {
 	const handleSettingsSubmit = async (
 		values: z.infer<typeof settingsSchema>,
 	) => {
-		try {
-			imageFormRef.current?.requestSubmit();
+		// console.log does not work inside this function
+		// for some reason
 
-			if (values.oldPassword === values.newPassword && values.newPassword) {
-				console.log(values.oldPassword, values.newPassword);
-				throw new Error("Old and new password cannot be the same");
-			}
+		imageFormRef.current?.requestSubmit();
 
-			// If nothing has changed, don't make a request
-			if (
-				userQuery.data?.email === values.email &&
-				userQuery.data?.username === values.username &&
-				!values.newPassword
-			)
-				return;
-
-			userMutation.mutate(values);
-		} catch (e) {
-			console.log(e);
-			if (e instanceof axios.AxiosError) {
-				if (e.response?.status === 403) {
-					setError(e.response.data as { message: string });
-				} else {
-					setError(
-						e.response?.data || {
-							message: "An error occurred while updating settings",
-						},
-					);
-				}
-			}
-			if (e instanceof Error) {
-				setError({ message: e.message });
-			}
-
-			throw e;
+		if (values.oldPassword === values.newPassword && values.newPassword) {
+			throw new Error("Old and new password cannot be the same");
 		}
+
+		// If nothing has changed, don't make a request
+		if (
+			userQuery.data?.email === values.email &&
+			userQuery.data?.username === values.username &&
+			!values.newPassword
+		)
+			return;
+
+		userMutation.mutate(values);
 	};
 
 	const settingsForm = useForm<z.infer<typeof settingsSchema>>({
+		mode: "onChange",
 		resolver: zodResolver(settingsSchema),
-		defaultValues: {
+		// Not tested but "values" works better than "defaultValues"
+		// since I have not encountered issues with this unlike "defaultValues" before
+		values: {
 			username: userQuery.data?.username || "", // This should be the user's username
 			email: userQuery.data?.email || "", // This should be the user's email
 			oldPassword: "",
@@ -158,14 +160,11 @@ export default function Settings() {
 		},
 	});
 
-	settingsForm.setValue("username", userQuery.data?.username || "");
-	settingsForm.setValue("email", userQuery.data?.email || "");
-
-	if (userQuery.isLoading || userQuery.isError) return <></>;
+	if (userQuery.isLoading || userQuery.isError || token === null) return <></>;
 
 	return (
 		<div className="flex flex-col align-middle">
-			<Card className="w-full max-w-screen-md mx-auto ">
+			<Card className="w-full max-w-screen-md mx-auto border-0">
 				<CardHeader>
 					<CardTitle className="text-center text-3xl">Settings</CardTitle>
 				</CardHeader>
@@ -230,12 +229,7 @@ export default function Settings() {
 													Email
 												</FormLabel>
 												<FormControl className="text-center">
-													<Input
-														{...field}
-														id="email"
-														// value={userQuery.data?.email}
-														// defaultValue={userQuery.data?.email}
-													/>
+													<Input {...field} id="email" />
 												</FormControl>
 												<FormMessage />
 											</FormItem>
