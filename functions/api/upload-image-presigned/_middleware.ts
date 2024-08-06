@@ -6,7 +6,9 @@ import { S3Client } from "@aws-sdk/client-s3";
 interface Env {
 	DB: D1Database;
 	JWT_SECRET: string;
-	R2: { ACCESS_KEY_ID: string; SECRET_ACCESS_KEY: string; ACCOUNT_ID: string };
+	ACCESS_KEY_ID: string;
+	SECRET_ACCESS_KEY: string;
+	ACCOUNT_ID: string;
 }
 
 const authentication: PagesFunction<Env> = async (ctx) => {
@@ -60,10 +62,10 @@ const validation: PagesFunction<Env> = async (ctx) => {
 const s3client: PagesFunction<Env> = async (ctx) => {
 	const s3 = new S3Client({
 		region: "auto",
-		endpoint: `https://${ctx.env.R2.ACCOUNT_ID}.r2.cloudflarestorage.com`,
+		endpoint: `https://${ctx.env.ACCOUNT_ID}.r2.cloudflarestorage.com`,
 		credentials: {
-			accessKeyId: ctx.env.R2.ACCESS_KEY_ID,
-			secretAccessKey: ctx.env.R2.SECRET_ACCESS_KEY,
+			accessKeyId: ctx.env.ACCESS_KEY_ID,
+			secretAccessKey: ctx.env.SECRET_ACCESS_KEY,
 		},
 	});
 	ctx.data.s3 = s3;

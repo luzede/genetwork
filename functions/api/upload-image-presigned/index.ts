@@ -8,9 +8,7 @@ import type { imageDetails, User } from "../../types";
 
 interface Env {
 	DB: D1Database;
-	R2: {
-		PUB_URL: string;
-	};
+	PUB_URL: string;
 }
 
 export const onRequestPost: PagesFunction<
@@ -28,7 +26,7 @@ export const onRequestPost: PagesFunction<
 	});
 
 	const presignedUrl = await getSignedUrl(s3, cmd, { expiresIn: 3600 });
-	const imageUrl = `${ctx.env.R2.PUB_URL}/${cmd.input.Key}`;
+	const imageUrl = `${ctx.env.PUB_URL}/${cmd.input.Key}`;
 
 	try {
 		// Before saving the image URL, we need to remove the previous image
