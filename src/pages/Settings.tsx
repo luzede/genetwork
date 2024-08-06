@@ -140,6 +140,11 @@ export default function Settings() {
 					"Content-Type": values.image.type,
 				},
 			});
+
+			toaster.toast({
+				title: "Success",
+				description: "Image uploaded successfully",
+			});
 		} catch (e) {
 			if (e instanceof axios.AxiosError) {
 				if (e.response?.status === 403) {
@@ -160,11 +165,6 @@ export default function Settings() {
 				throw e;
 			}
 		}
-
-		toaster.toast({
-			title: "Success",
-			description: "Image uploaded successfully",
-		});
 	};
 
 	const handleSettingsSubmit = async (
