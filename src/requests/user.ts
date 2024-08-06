@@ -1,14 +1,14 @@
 import axios from "axios";
 
 // Types
-type UserUpdate = {
+export type UserUpdate = {
 	username: string;
 	email: string;
 	old_password?: string;
 	new_password?: string;
 };
 
-type User = {
+export type User = {
 	username: string;
 	email: string;
 	profile_url: string;
@@ -33,11 +33,11 @@ export async function getUser(token: string | null) {
 	return resp.data;
 }
 
-export async function updateUser(values: UserUpdate) {
+export async function updateUser(values: UserUpdate, token: string | null) {
 	const resp = await axios.put<User>("/api/users/me", values, {
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${localStorage.getItem("token")}`,
+			Authorization: `Bearer ${token}`,
 		},
 	});
 	return resp.data;

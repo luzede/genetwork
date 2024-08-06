@@ -9,7 +9,6 @@ CREATE TABLE users (
     password_hash VARCHAR(97) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     profile_url TEXT DEFAULT NULL
 );
 

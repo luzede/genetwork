@@ -36,6 +36,9 @@ import { getUser, updateUser } from "@/requests/user";
 // Schemas
 import { settingsSchema } from "@/zodSchemas";
 
+// Types
+import type { UserUpdate } from "@/requests/user";
+
 // Protected
 const protected_pathnames = ["/settings", "/profile", "/create"];
 
@@ -68,7 +71,8 @@ export default function Settings() {
 	}, [navigate, userQuery, setToken, queryClient, token, location]);
 
 	const userMutation = useMutation({
-		mutationFn: updateUser,
+		mutationFn: (values: UserUpdate) =>
+			updateUser(values, localStorage.getItem("token")),
 		onSuccess: () => {
 			toaster.toast({
 				variant: "default",
@@ -109,7 +113,7 @@ export default function Settings() {
 	const toaster = useToast();
 
 	const handleImageSubmit = async (values: { image?: File | null }) => {
-		if (!values.image) return;
+		if (!values.image || values.image.size === 0) return;
 
 		const body = {
 			name: values.image.name,
@@ -117,11 +121,50 @@ export default function Settings() {
 			type: values.image.type,
 		};
 
-		console.log(body);
-		// 	// toast.success(`Image uploaded successfully 🎉 ${values.image.name}`);
+		try {
+			// Getting the presigned URL
+			const resp = await axios.post<{ presignedUrl: string }>(
+				"/api/upload-image-presigned",
+				body,
+				{
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+				},
+			);
 
-		// 	// I guess here I get the signed URL from the server
-		// 	// and begin the upload process
+			// Uploading the image to the bucket
+			await axios.put(resp.data.presignedUrl, values.image, {
+				headers: {
+					"Content-Type": values.image.type,
+				},
+			});
+		} catch (e) {
+			if (e instanceof axios.AxiosError) {
+				if (e.response?.status === 403) {
+					setError(e.response.data as { message: string });
+					localStorage.removeItem("token");
+					setToken(null);
+					navigate("/login");
+				} else {
+					setError(
+						e.response?.data || {
+							message: "An error occurred while updating settings",
+						},
+					);
+				}
+			} else if (e instanceof Error) {
+				setError({ message: e.message });
+			} else {
+				throw e;
+			}
+		}
+
+		toaster.toast({
+			title: "Success",
+			description: "Image uploaded successfully",
+		});
 	};
 
 	const handleSettingsSubmit = async (
