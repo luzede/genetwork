@@ -20,31 +20,17 @@ export const onRequestPost: PagesFunction<
 
 	const cmd = new PutObjectCommand({
 		Bucket: "cloudflare-demo-app",
-		Key: `${crypto.randomUUID()}_${imageDetails.name}`,
+		Key: user_id,
 		ContentType: imageDetails.type,
 		ContentLength: imageDetails.size,
 	});
 
+	// Even if there is an object in the presigned URL, it will be overwritten
 	const presignedUrl = await getSignedUrl(s3, cmd, { expiresIn: 3600 });
 	const imageUrl = `${ctx.env.PUB_URL}/${cmd.input.Key}`;
 
 	try {
-		// Before saving the image URL, we need to remove the previous image
-		// if it exists in the bucket
-		const user = await ctx.env.DB.prepare("SELECT * FROM users WHERE id = ?1")
-			.bind(user_id)
-			.first<User>();
-		if (user.profile_url) {
-			const url = user.profile_url;
-			const key = url.split("/").at(-1);
-			const delCmd = new DeleteObjectCommand({
-				Bucket: "cloudflare-demo-app",
-				Key: key,
-			});
-			await s3.send(delCmd);
-		}
-
-		// Save the image URl to the database
+		// Save the image URL to the database
 		await ctx.env.DB.prepare("UPDATE users SET profile_url = ?1 WHERE id = ?2")
 			.bind(imageUrl, user_id)
 			.run();
