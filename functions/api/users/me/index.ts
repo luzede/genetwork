@@ -10,15 +10,13 @@ interface Env {
 export const onRequestGet: PagesFunction<
 	Env,
 	undefined,
-	{ username: string }
+	{ user_id: string }
 > = async (ctx) => {
 	// We don't need to verify if the user exists because it is guaranteed
 	// since JWT are only given to those who have an account
 
-	const user = await ctx.env.DB.prepare(
-		"SELECT * FROM users WHERE username = ?1",
-	)
-		.bind(ctx.data.username)
+	const user = await ctx.env.DB.prepare("SELECT * FROM users WHERE id = ?1")
+		.bind(ctx.data.user_id)
 		.first<User>();
 	return Response.json({
 		username: user.username,
@@ -30,16 +28,14 @@ export const onRequestGet: PagesFunction<
 export const onRequestPut: PagesFunction<
 	Env,
 	undefined,
-	{ username: string }
+	{ user_id: string }
 > = async (ctx) => {
 	try {
 		const body = await ctx.request.json<UserUpdate>();
 		const data = settingsSchema.parse(body);
 
-		const user = await ctx.env.DB.prepare(
-			"SELECT * FROM users WHERE username = ?1",
-		)
-			.bind(ctx.data.username)
+		const user = await ctx.env.DB.prepare("SELECT * FROM users WHERE id = ?1")
+			.bind(ctx.data.user_id)
 			.first<User>();
 
 		if (data.username !== user.username) {
@@ -71,9 +67,9 @@ export const onRequestPut: PagesFunction<
 		}
 
 		await ctx.env.DB.prepare(
-			"UPDATE users SET username = ?1, email = ?2 WHERE username = ?3",
+			"UPDATE users SET username = ?1, email = ?2 WHERE id = ?3",
 		)
-			.bind(data.username, data.email, ctx.data.username)
+			.bind(data.username, data.email, ctx.data.user_id)
 			.run();
 
 		return Response.json({ message: "User updated" }, { status: 200 });

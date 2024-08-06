@@ -2,6 +2,7 @@ import type { z } from "zod";
 import type { imageDetailsSchema } from "./schemas";
 
 export type User = {
+	id: string;
 	username: string;
 	email: string;
 	password_hash: string;

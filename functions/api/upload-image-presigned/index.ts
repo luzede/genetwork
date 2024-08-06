@@ -14,9 +14,9 @@ interface Env {
 export const onRequestPost: PagesFunction<
 	Env,
 	undefined,
-	{ imageDetails: imageDetails; s3: S3Client; username: string }
+	{ imageDetails: imageDetails; s3: S3Client; user_id: string }
 > = async (ctx) => {
-	const { imageDetails, s3, username } = ctx.data;
+	const { imageDetails, s3, user_id } = ctx.data;
 
 	const cmd = new PutObjectCommand({
 		Bucket: "cloudflare-demo-app",
@@ -31,10 +31,8 @@ export const onRequestPost: PagesFunction<
 	try {
 		// Before saving the image URL, we need to remove the previous image
 		// if it exists in the bucket
-		const user = await ctx.env.DB.prepare(
-			"SELECT * FROM users WHERE username = ?1",
-		)
-			.bind(username)
+		const user = await ctx.env.DB.prepare("SELECT * FROM users WHERE id = ?1")
+			.bind(user_id)
 			.first<User>();
 		if (user.profile_url) {
 			const url = user.profile_url;
@@ -47,10 +45,8 @@ export const onRequestPost: PagesFunction<
 		}
 
 		// Save the image URl to the database
-		await ctx.env.DB.prepare(
-			"UPDATE users SET profile_url = ?1 WHERE username = ?2",
-		)
-			.bind(imageUrl, username)
+		await ctx.env.DB.prepare("UPDATE users SET profile_url = ?1 WHERE id = ?2")
+			.bind(imageUrl, user_id)
 			.run();
 	} catch (e) {
 		return Response.json(

@@ -63,9 +63,9 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 
 		// Inserting data into the database
 		await ctx.env.DB.prepare(
-			"INSERT INTO users (username, password_hash, email) VALUES (?1, ?2, ?3);",
+			"INSERT INTO users (id, username, password_hash, email) VALUES (?1, ?2, ?3, ?4);",
 		)
-			.bind(data.username, hashedPassword, data.email)
+			.bind(crypto.randomUUID(), data.username, hashedPassword, data.email)
 			.run();
 
 		return Response.json({ message: "User account created" }, { status: 201 });

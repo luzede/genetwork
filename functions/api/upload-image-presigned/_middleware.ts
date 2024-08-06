@@ -25,7 +25,7 @@ const authentication: PagesFunction<Env> = async (ctx) => {
 			encoder.encode(ctx.env.JWT_SECRET),
 		);
 		// Pass in the username to the context data
-		ctx.data.username = payload.sub;
+		ctx.data.user_id = payload.sub;
 		return ctx.next();
 	} catch (e) {
 		return Response.json({ message: "Unauthorized" }, { status: 403 });

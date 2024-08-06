@@ -40,7 +40,7 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 		const encoder = new TextEncoder();
 
 		const token = await new jose.SignJWT()
-			.setSubject(user.username)
+			.setSubject(user.id)
 			.setExpirationTime(ctx.env.JWT_EXPIRATION)
 			.setProtectedHeader({ alg: "HS256" })
 			.sign(encoder.encode(ctx.env.JWT_SECRET));
