@@ -31,7 +31,9 @@ export const onRequestPost: PagesFunction<
 
 	try {
 		// Save the image URL to the database
-		await ctx.env.DB.prepare("UPDATE users SET profile_url = ?1 WHERE id = ?2")
+		await ctx.env.DB.prepare(
+			"UPDATE users SET profile_url = ?1 WHERE id = ?2 AND profile_url IS NULL",
+		)
 			.bind(imageUrl, user_id)
 			.run();
 	} catch (e) {
