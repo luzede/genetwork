@@ -6,7 +6,7 @@
 // Hooks and other utilities
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { QueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
@@ -39,7 +39,7 @@ import { useToken } from "@/tokenContext";
 import { loginSchema } from "@/zodSchemas";
 
 export default function Login() {
-	const queryClient = new QueryClient();
+	const queryClient = useQueryClient();
 	const navigate = useNavigate();
 	const { token, setToken } = useToken();
 

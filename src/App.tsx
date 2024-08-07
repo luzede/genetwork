@@ -8,6 +8,7 @@ import Register from "@/pages/Register";
 import Layout from "./Layout";
 import Home from "@/pages/Home";
 import Settings from "@/pages/Settings";
+import Create from "@/pages/Create";
 
 // Requests
 
@@ -21,6 +22,7 @@ const App = () => {
 						<Route path="/settings" element={<Settings />} />
 						<Route path="/login" element={<Login />} />
 						<Route path="/register" element={<Register />} />
+						<Route path="/create" element={<Create />} />
 					</Routes>
 				</Layout>
 			</TokenContextProvider>

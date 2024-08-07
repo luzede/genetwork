@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios, { AxiosError } from "axios";
 import { AlertErrorMessage } from "@/components";
+import { useToken } from "@/tokenContext";
 
 import {
 	Form,
@@ -61,13 +62,13 @@ export default function Register() {
 		name?: string;
 	} | null>(null);
 
-	const [tokenExists] = useState(localStorage.getItem("token") !== null);
+	const { token } = useToken();
 
 	useEffect(() => {
-		if (tokenExists) {
+		if (token) {
 			navigate("/");
 		}
-	}, [tokenExists, navigate]);
+	}, [token, navigate]);
 
 	const registerForm = useForm<z.infer<typeof registerSchema>>({
 		resolver: zodResolver(registerSchema),
@@ -103,12 +104,7 @@ export default function Register() {
 		}
 	}
 
-	function onClick() {
-		const form = document.getElementById("register-form") as HTMLFormElement;
-		form.requestSubmit();
-	}
-
-	return tokenExists ? (
+	return token ? (
 		<></>
 	) : (
 		<Card className="w-full max-w-md mx-auto my-32 lg:my-12">
@@ -180,7 +176,7 @@ export default function Register() {
 				</Form>
 			</CardContent>
 			<CardFooter>
-				<Button onClick={onClick} className="w-full">
+				<Button form="register-form" type="submit" className="w-full">
 					Register
 				</Button>
 			</CardFooter>

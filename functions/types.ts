@@ -25,4 +25,27 @@ export type Post = {
 	created_at: string;
 };
 
+export type PostJoinedUser = {
+	id: number;
+	content: string;
+	owner: string;
+	likes: number;
+	created_at: string;
+	username: string;
+	password_hash: string;
+	email: string;
+	profile_url: string;
+	liked?: 1 | null;
+};
+
+export type PostFE = {
+	id: number;
+	content: string;
+	likes: number;
+	username: string;
+	profile_url: string;
+	created_at: string;
+	liked?: 1 | null;
+};
+
 export type imageDetails = z.infer<typeof imageDetailsSchema>;

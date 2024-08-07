@@ -1,6 +1,6 @@
 // Hooks and other utilities
 import { useNavigate, useLocation } from "react-router-dom";
-import { QueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useToken } from "@/tokenContext";
 // import { useEffect } from "react";
 
@@ -35,7 +35,7 @@ type Props = {
 // ####################################################
 export function UserMenu({ className }: Props) {
 	const { token, setToken } = useToken();
-	const queryClient = new QueryClient();
+	const queryClient = useQueryClient();
 
 	const navigate = useNavigate();
 	const location = useLocation();
