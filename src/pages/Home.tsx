@@ -4,6 +4,7 @@
 import axios from "axios";
 import { useToken } from "@/tokenContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
 
 // Components
 import {
@@ -21,6 +22,7 @@ import { Heart, UserCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Home() {
+	const toaster = useToast();
 	const { setToken } = useToken();
 	const queryClient = useQueryClient();
 	const postsQuery = useQuery<Post[]>({
@@ -79,6 +81,12 @@ export default function Home() {
 					localStorage.removeItem("token");
 					setToken(null);
 					queryClient.invalidateQueries({ queryKey: ["user"] });
+					toaster.toast({
+						variant: "destructive",
+						title: "Unauthorized",
+						description:
+							"You are not logged in, you need to login to like a post",
+					});
 				}
 			}
 			console.log(e);
@@ -177,11 +185,16 @@ export default function Home() {
 							disabled={postLikeMutation.isPending}
 							className="flex-auto flex justify-evenly align-middle m-2 py-2"
 						>
-							<Heart
-								className="h-7 w-7"
-								// fill={post.liked ? "currentColor" : undefined}
-							/>
-							<span className="text-2xl font-normal">{post.likes + 5000}</span>
+							{post.liked ? (
+								// It does not matter what value I give to fill,
+								// it will always feel as long as attribute is active
+								// even if the value of the attribute is undefined
+								// so I had to make two icons, one with fill and one without
+								<Heart className="h-7 w-7" fill="whatever" />
+							) : (
+								<Heart className="h-7 w-7" />
+							)}
+							<span className="text-2xl font-normal">{post.likes}</span>
 						</Button>
 					</CardFooter>
 				</Card>
