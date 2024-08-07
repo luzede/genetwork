@@ -147,15 +147,17 @@ export default function Home() {
 							to={`/user/${post.username}`}
 							className="flex flex-row justify-start align-middle gap-3 p-6"
 						>
-							{post.profile_url ? (
-								<img
-									src={post.profile_url}
-									alt="profile"
-									className="object-cover max-w-sm min-w-16"
-								/>
-							) : (
-								<UserCircle className="h-10 w-10" />
-							)}
+							<div className="rounded-full">
+								{post.profile_url ? (
+									<img
+										src={post.profile_url}
+										alt="profile"
+										className="object-cover h-10 w-10"
+									/>
+								) : (
+									<UserCircle className="h-10 w-10" />
+								)}
+							</div>
 							<CardTitle className="flex justify-center align-middle translate-y-1">
 								{post.username}
 							</CardTitle>
