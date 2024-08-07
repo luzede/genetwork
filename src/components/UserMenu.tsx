@@ -1,8 +1,8 @@
 // Hooks and other utilities
 import { useNavigate, useLocation } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useToken } from "@/tokenContext";
-// import { useEffect } from "react";
+import { useEffect } from "react";
 
 // Components
 import {
@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { getUser } from "@/requests/user";
 
 // Requests
 
@@ -34,8 +35,13 @@ type Props = {
 // COMPONENT
 // ####################################################
 export function UserMenu({ className }: Props) {
-	const { token, setToken } = useToken();
 	const queryClient = useQueryClient();
+	const userQuery = useQuery({
+		queryKey: ["user"],
+		queryFn: () => getUser(localStorage.getItem("token")),
+		retry: false,
+	});
+	const { token, setToken } = useToken();
 
 	const navigate = useNavigate();
 	const location = useLocation();
@@ -46,6 +52,15 @@ export function UserMenu({ className }: Props) {
 		queryClient.resetQueries({ queryKey: ["user"] });
 		setToken(null);
 	};
+
+	useEffect(() => {
+		if (userQuery.isError) {
+			localStorage.removeItem("token");
+			setToken(null);
+			queryClient.invalidateQueries({ queryKey: ["user"] });
+			queryClient.resetQueries({ queryKey: ["user"] });
+		}
+	}, [userQuery, setToken, queryClient]);
 
 	return (
 		<DropdownMenu>
