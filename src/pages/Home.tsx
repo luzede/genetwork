@@ -15,11 +15,13 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Heart, UserCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 // Types
 import type { Post } from "@/requests/posts";
-import { Heart, UserCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+
+import type { User } from "@/requests/user";
 
 export default function Home() {
 	const toaster = useToast();
@@ -39,7 +41,6 @@ export default function Home() {
 				.then((res) => res.data),
 		staleTime: 1000 * 60 * 5,
 		retry: false,
-		refetchOnMount: false,
 	});
 
 	const postLikeMutation = useMutation({
@@ -163,7 +164,12 @@ export default function Home() {
 				<Card key={post.id} className="max-w-lg w-full mx-auto">
 					<CardHeader className="flex align-middle p-0">
 						<Link
-							to={`/user/${post.username}`}
+							to={
+								queryClient.getQueryData<User>(["user"])?.username ===
+								post.username
+									? "/profile"
+									: `/user/${post.username}`
+							}
 							className="flex flex-row justify-start align-middle gap-3 p-6"
 						>
 							{post.profile_url ? (
@@ -195,10 +201,7 @@ export default function Home() {
 							className="flex-auto flex justify-evenly align-middle m-2 py-2"
 						>
 							{post.liked === 1 ? (
-								// It does not matter what value I give to fill,
-								// it will always feel as long as attribute is active
-								// even if the value of the attribute is undefined
-								// so I had to make two icons, one with fill and one without
+								// (Seems like fill attribute does not work and had to use tw fill-current)
 								<Heart className="h-7 w-7 fill-current" fill="currentFill" />
 							) : (
 								<Heart className="h-7 w-7" />

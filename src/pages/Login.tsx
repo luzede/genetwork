@@ -115,10 +115,8 @@ export default function Login() {
 			// and redirect the user to the home page
 			localStorage.setItem("token", resp.data.token);
 			setToken(resp.data.token);
-			queryClient.invalidateQueries({ queryKey: ["user"] });
-			queryClient.resetQueries({ queryKey: ["user"] });
-			queryClient.invalidateQueries({ queryKey: ["posts"] });
-			queryClient.resetQueries({ queryKey: ["posts"] });
+			queryClient.invalidateQueries();
+			queryClient.resetQueries();
 			navigate("/");
 		} catch (err) {
 			if (err instanceof axios.AxiosError) {

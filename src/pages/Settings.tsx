@@ -64,8 +64,8 @@ export default function Settings() {
 		if (userQuery.isError || token === null) {
 			localStorage.removeItem("token");
 			setToken(null);
-			queryClient.invalidateQueries({ queryKey: ["user"] });
-			queryClient.resetQueries({ queryKey: ["user"] });
+			queryClient.invalidateQueries();
+			queryClient.resetQueries();
 			if (protected_pathnames.includes(location.pathname)) navigate("/login");
 		}
 	}, [navigate, userQuery, setToken, queryClient, token, location]);

@@ -26,3 +26,20 @@ export async function newPost(content: string, token: string | null) {
 	);
 	return resp.data;
 }
+
+export async function getPosts(
+	username?: string,
+	before?: string,
+	token?: string | null,
+) {
+	const resp = await axios.get<Post[]>("/api/posts", {
+		headers: {
+			Authorization: token ? `Bearer ${token}` : undefined,
+		},
+		params: {
+			username,
+			before,
+		},
+	});
+	return resp.data;
+}

@@ -43,10 +43,8 @@ export const settingsSchema = z.object({
 
 // imageFormSchema
 export const imageFormSchema = z.object({
-	image: z
-		//Rest of validations done via react dropzone
-		.instanceof(File)
-		.nullish(),
+	//Rest of validations done via react dropzone
+	image: z.instanceof(File).nullish(),
 });
 
 export const loginSchema = z.object({

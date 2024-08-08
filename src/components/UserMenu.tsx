@@ -41,7 +41,6 @@ export function UserMenu({ className }: Props) {
 		queryFn: () => getUser(localStorage.getItem("token")),
 		retry: false,
 		staleTime: 1000 * 60 * 5,
-		retryDelay: 1000,
 	});
 	const { token, setToken } = useToken();
 
@@ -50,8 +49,8 @@ export function UserMenu({ className }: Props) {
 
 	const handleLogout = () => {
 		localStorage.removeItem("token");
-		queryClient.invalidateQueries({ queryKey: ["user"] });
-		queryClient.resetQueries({ queryKey: ["user"] });
+		queryClient.invalidateQueries();
+		queryClient.resetQueries();
 		setToken(null);
 	};
 

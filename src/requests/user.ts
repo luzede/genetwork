@@ -18,7 +18,9 @@ export type User = {
 
 // Query function to get the current user
 export async function getUser(token: string | null) {
-	console.log(token, "In getUser");
+	// Logging when user is not logged in causes unstoppable trials to connect to the server
+	// and prints out messages very fast in rapid succession
+	// console.log(token, "In getUser");
 	if (!token) throw new Error("No token provided");
 
 	const resp = await axios.get<{

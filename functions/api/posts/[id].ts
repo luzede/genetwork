@@ -26,19 +26,21 @@ export const onRequestDelete: PagesFunction<
 	const user_id = ctx.data.user_id;
 	try {
 		const post = await ctx.env.DB.prepare("SELECT * FROM posts WHERE id = ?1")
-			.bind(ctx.params.id)
+			.bind(Number.parseInt(ctx.params.id as string))
 			.first<Post>();
 		if (post.owner !== user_id) {
 			return Response.json("You cannot delete someone else's post", {
 				status: 403,
 			});
 		}
+		// Response with null body status (101, 204, 205, or 304) cannot have a body.
 		await ctx.env.DB.prepare("DELETE FROM posts WHERE id = ?1")
-			.bind(ctx.params.id)
+			.bind(Number.parseInt(ctx.params.id as string))
 			.run();
-		return Response.json({ message: "Post deleted" }, { status: 204 });
+		//
+		return Response.json({ status: 204 });
 	} catch (e) {
-		return Response.json({ message: "Post not found" }, { status: 404 });
+		return Response.json({ name: e.name, message: e.message }, { status: 500 });
 	}
 };
 
