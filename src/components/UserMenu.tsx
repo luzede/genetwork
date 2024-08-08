@@ -39,7 +39,8 @@ export function UserMenu({ className }: Props) {
 	const userQuery = useQuery({
 		queryKey: ["user"],
 		queryFn: () => getUser(localStorage.getItem("token")),
-		retry: false,
+		retry: true,
+		retryDelay: 1000,
 		staleTime: 1000 * 60 * 5,
 	});
 	const { token, setToken } = useToken();

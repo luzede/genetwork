@@ -1,10 +1,11 @@
 // Hooks and other utilities
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useToken } from "@/tokenContext";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { z } from "zod";
 import { useToast } from "@/components/ui/use-toast";
+import { useEffect } from "react";
 
 // Components
 import {
@@ -25,10 +26,20 @@ import { getPosts } from "@/requests/posts";
 import type { Post } from "@/requests/posts";
 
 export default function UserProfile() {
+	const navigate = useNavigate();
 	const toaster = useToast();
 	const { username } = useParams();
-	const { token, setToken } = useToken();
+	const { setToken } = useToken();
 	const queryClient = useQueryClient();
+
+	useEffect(() => {
+		console.log("User profile page mounted");
+		const user = queryClient.getQueryData<User>(["user"]);
+
+		if (user?.username === username) {
+			navigate("/profile");
+		}
+	}, [queryClient, navigate, username]);
 
 	const userQuery = useQuery({
 		queryKey: ["user", username],
@@ -50,8 +61,7 @@ export default function UserProfile() {
 
 			return getPosts(username, undefined, localStorage.getItem("token"));
 		},
-		retry: true,
-		retryDelay: 1000,
+		retry: false,
 	});
 
 	const postLikeMutation = useMutation({
@@ -74,7 +84,7 @@ export default function UserProfile() {
 			return { postId, message: resp.data.message };
 		},
 		onSuccess: ({ postId, message }) => {
-			const posts = queryClient.getQueryData<Post[]>(["posts"]);
+			const posts = queryClient.getQueryData<Post[]>(["posts", username]);
 			if (posts === undefined) {
 				queryClient.invalidateQueries({ queryKey: ["posts", username] });
 				queryClient.resetQueries({ queryKey: ["posts", username] });
@@ -119,11 +129,57 @@ export default function UserProfile() {
 		},
 	});
 
+	const loadPostsMutation = useMutation({
+		mutationFn: () => {
+			const posts = queryClient.getQueryData<Post[]>(["posts", username]);
+			if (posts === undefined) {
+				queryClient.invalidateQueries({ queryKey: ["posts", username] });
+				queryClient.resetQueries({ queryKey: ["posts", username] });
+				throw new Error(
+					"Unknown error occured in 'onSuccess' of postsMutation of Home.tsx where post is tried to be liked",
+				);
+			}
+			const lastPost = posts.at(-1);
+			return axios
+				.get<Post[]>("/api/posts", {
+					params: {
+						before: lastPost
+							? `${lastPost.created_at.replace(" ", "T")}Z`
+							: undefined,
+					},
+					headers: {
+						Authorization: localStorage.getItem("token")
+							? `Bearer ${localStorage.getItem("token")}`
+							: undefined,
+					},
+				})
+				.then((res) => res.data);
+		},
+		onSuccess: (olderPosts) => {
+			const posts = queryClient.getQueryData<Post[]>(["posts", username]);
+			if (posts === undefined) {
+				console.log(
+					"Unknown error occured in 'onSuccess' of loadPostsMutation of User.tsx",
+				);
+			} else {
+				queryClient.setQueryData(["posts", username], posts.concat(olderPosts));
+			}
+		},
+		onError: (e) => {
+			if (e instanceof axios.AxiosError) {
+				if (e.response?.status === 422) {
+					console.log("Faulty query parameters provided");
+				}
+				console.log(e);
+			}
+		},
+	});
+
 	if (userQuery.isLoading) return <div>Loading...</div>;
 
-	if (userQuery.isError || !token) return <></>;
+	if (userQuery.isError) return <></>;
 
-	if (!userPostsQuery.data || !userQuery.data) return <></>;
+	if (!userQuery.data) return <></>;
 
 	return (
 		<div className="flex flex-col align-middle gap-3 px-3">
@@ -132,7 +188,7 @@ export default function UserProfile() {
 					<img
 						src={userQuery.data.profile_url}
 						alt="profile"
-						className="object-cover h-32 w-32 rounded-full mx-auto"
+						className="object-cover h-32 w-32 rounded-full mx-auto flex justify-center align-middle"
 					/>
 				) : (
 					<UserCircle className="h-32 w-32 rounded-full mx-auto" />
@@ -142,9 +198,10 @@ export default function UserProfile() {
 					<span className="font-bold">Email: {userQuery.data.email}</span>
 				</CardDescription>
 			</Card>
-			{userPostsQuery.isLoading ? (
+			<CardTitle className="text-2xl font-bold mx-auto">Posts</CardTitle>
+			{userPostsQuery.isLoading || !userPostsQuery.data ? (
 				<div>Loading...</div>
-			) : (
+			) : userPostsQuery.data.length > 0 ? (
 				userPostsQuery.data.map((post) => (
 					<Card key={post.id} className="max-w-lg w-full mx-auto">
 						<CardContent className="text-xl pt-6 pb-3">
@@ -174,7 +231,17 @@ export default function UserProfile() {
 						</CardFooter>
 					</Card>
 				))
+			) : (
+				<div className="mx-auto">No posts found.</div>
 			)}
+			<Button
+				variant={"default"}
+				onClick={() => loadPostsMutation.mutate()}
+				className="mx-auto w-full max-w-lg"
+				disabled={loadPostsMutation.isPending}
+			>
+				Load more posts
+			</Button>
 		</div>
 	);
 }

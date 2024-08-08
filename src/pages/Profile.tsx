@@ -162,7 +162,7 @@ export default function Profile() {
 					<img
 						src={userQuery.data.profile_url}
 						alt="profile"
-						className="object-cover h-32 w-32 rounded-full mx-auto"
+						className="object-cover h-32 w-32 rounded-full mx-auto flex justify-center align-middle"
 					/>
 				) : (
 					<UserCircle className="h-32 w-32 rounded-full mx-auto" />
