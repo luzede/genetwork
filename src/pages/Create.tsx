@@ -38,7 +38,7 @@ export default function Create() {
 			if (posts === undefined) {
 				queryClient.setQueryData(["posts"], [newPost]);
 			} else {
-				queryClient.setQueryData(["posts"], posts.unshift(newPost));
+				queryClient.setQueryData(["posts"], [newPost].concat(posts));
 			}
 			navigate("/");
 		},

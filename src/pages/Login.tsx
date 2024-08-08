@@ -117,6 +117,8 @@ export default function Login() {
 			setToken(resp.data.token);
 			queryClient.invalidateQueries({ queryKey: ["user"] });
 			queryClient.resetQueries({ queryKey: ["user"] });
+			queryClient.invalidateQueries({ queryKey: ["posts"] });
+			queryClient.resetQueries({ queryKey: ["posts"] });
 			navigate("/");
 		} catch (err) {
 			if (err instanceof axios.AxiosError) {

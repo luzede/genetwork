@@ -77,6 +77,7 @@ export const onRequestPut: PagesFunction<
 		)
 			.bind(ctx.data.user_id, ctx.params.id)
 			.run();
+
 		if (!resp.meta.changed_db) {
 			return Response.json({ message: "NOT_LIKED" }, { status: 409 });
 		}

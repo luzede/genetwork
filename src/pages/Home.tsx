@@ -27,7 +27,16 @@ export default function Home() {
 	const queryClient = useQueryClient();
 	const postsQuery = useQuery<Post[]>({
 		queryKey: ["posts"],
-		queryFn: () => axios.get("/api/posts").then((res) => res.data),
+		queryFn: () =>
+			axios
+				.get("/api/posts", {
+					headers: {
+						Authorization: localStorage.getItem("token")
+							? `Bearer ${localStorage.getItem("token")}`
+							: undefined,
+					},
+				})
+				.then((res) => res.data),
 		staleTime: 1000 * 60 * 5,
 		retry: false,
 		refetchOnMount: false,
@@ -70,6 +79,8 @@ export default function Home() {
 								: message === "LIKED"
 									? post.likes + 1
 									: post.likes - 1,
+						liked:
+							post.id !== postId ? post.liked : message === "LIKED" ? 1 : null,
 					};
 				});
 				queryClient.setQueryData(["posts"], updatedPosts);
@@ -177,18 +188,18 @@ export default function Home() {
 							onClick={() =>
 								postLikeMutation.mutate({
 									postId: post.id,
-									type: post.liked ? "DISLIKE" : "LIKE",
+									type: post.liked === 1 ? "DISLIKE" : "LIKE",
 								})
 							}
 							disabled={postLikeMutation.isPending}
 							className="flex-auto flex justify-evenly align-middle m-2 py-2"
 						>
-							{post.liked ? (
+							{post.liked === 1 ? (
 								// It does not matter what value I give to fill,
 								// it will always feel as long as attribute is active
 								// even if the value of the attribute is undefined
 								// so I had to make two icons, one with fill and one without
-								<Heart className="h-7 w-7" fill="whatever" />
+								<Heart className="h-7 w-7 fill-current" fill="currentFill" />
 							) : (
 								<Heart className="h-7 w-7" />
 							)}

@@ -40,6 +40,8 @@ export function UserMenu({ className }: Props) {
 		queryKey: ["user"],
 		queryFn: () => getUser(localStorage.getItem("token")),
 		retry: false,
+		staleTime: 1000 * 60 * 5,
+		retryDelay: 1000,
 	});
 	const { token, setToken } = useToken();
 
