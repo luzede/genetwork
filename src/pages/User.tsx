@@ -29,22 +29,28 @@ export default function UserProfile() {
 	const navigate = useNavigate();
 	const toaster = useToast();
 	const { username } = useParams();
-	const { setToken } = useToken();
+	const { token, setToken } = useToken();
 	const queryClient = useQueryClient();
 
 	useEffect(() => {
 		console.log("User profile page mounted");
+		if (token === null) {
+			console.log("User is not logged in");
+			return;
+		}
 		const user = queryClient.getQueryData<User>(["user"]);
 
 		if (user?.username === username) {
 			navigate("/profile");
 		}
-	}, [queryClient, navigate, username]);
+	}, [queryClient, navigate, username, token]);
 
 	const userQuery = useQuery({
-		queryKey: ["user", username],
-		queryFn: () =>
-			axios.get<User>(`/api/users/${username}`).then((res) => res.data),
+		queryKey: [`user ${username}`],
+		queryFn: () => {
+			console.log("Test");
+			return axios.get<User>(`/api/users/${username}`).then((res) => res.data);
+		},
 		retry: false,
 	});
 
