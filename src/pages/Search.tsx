@@ -30,7 +30,7 @@ export default function Search() {
 			} catch (e) {
 				console.log(e);
 			}
-		}, 1000);
+		}, 600);
 		setTimeoutId(id);
 	};
 

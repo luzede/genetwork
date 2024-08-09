@@ -1,1 +1,31 @@
+name = "cloudflare-demo-app" # The name of your project
+pages_build_output_dir = "./dist" # The folder of the output of your build process
+compatibility_date = "2024-08-01" # Whatever it is, just pick a date
+
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "cloudflare-demo-app" # The name of your database
+database_id = "DATABASE_ID" # The ID of your database
+# preview_database_id = "PREVIEW_DATABASE_ID" # The ID of your preview database
+migrations_dir = "./migrations"
+
+# Bucket is actually useless if you are going to use
+# aws-sdk to interact with R2. So you can ignore this.
+# [[r2_buckets]]
+# binding = "BUCKET" # i.e. available in your Worker on env.BUCKET
+# bucket_name = "cloudflare-demo-app"
+ 
+
+[vars]
+JWT_SECRET = "SECRET"
+JWT_EXPIRATION = "30m" # The expiration time of your JWT, e.g. 1h, 1d, 1w, 1m, 1y
+ACCESS_KEY_ID = "ACCESS_KEY_ID" # Your R2 Access Key ID used to initiate S3Client
+SECRET_ACCESS_KEY = "SECRET_ACCESS_KEY" # Your R2 Secret Access Key used to initiate S3Client
+ACCOUNT_ID = "ACCOUNT_ID" # Your Cloudflare Account ID
+PUB_URL = "https://pub-something.r2.dev" # The URL of your R2 public endpoint, you have to enable this and it is limited 
+
+
+
+
+
 
