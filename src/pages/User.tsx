@@ -45,8 +45,7 @@ export default function UserProfile() {
 		queryKey: ["user", username],
 		queryFn: () =>
 			axios.get<User>(`/api/users/${username}`).then((res) => res.data),
-		retry: true,
-		retryDelay: 1000,
+		retry: false,
 	});
 
 	const userPostsQuery = useQuery<Post[]>({
