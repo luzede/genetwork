@@ -5,7 +5,7 @@
 
 // Hooks and other utilities
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -208,7 +208,10 @@ export default function Login() {
 					</form>
 				</Form>
 			</CardContent>
-			<CardFooter>
+			<CardFooter className="flex flex-col items-center gap-3">
+				<Button variant={"link"}>
+					<Link to="/register">Register?</Link>
+				</Button>
 				<Button onClick={onClick} className="w-full">
 					Login
 				</Button>
