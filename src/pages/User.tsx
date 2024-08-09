@@ -151,6 +151,7 @@ export default function UserProfile() {
 						before: lastPost
 							? `${lastPost.created_at.replace(" ", "T")}Z`
 							: undefined,
+						username: username,
 					},
 					headers: {
 						Authorization: localStorage.getItem("token")
